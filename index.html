@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>diff thing</title>
+        <link rel="stylesheet" type="text/css" href="prrism.css">
+        <style type="text/css">
+        pre {
+            max-width: 900px;
+            max-height: 60em;
+        }
+        #blob {
+            overflow: scroll;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            max-width: 900px;
+        }
+        #blob div {
+            padding: 5px;
+            white-space: pre-wrap;
+            font-family: Courier New, sans-serif;
+            font-size: .8em;
+            color: #fff;
+            background-color: #22221D;
+        }
+        #blob div:nth-child(even) {
+        }
+        #blob div:nth-child(odd) {
+        }
+        #blob div.applied-add {
+            color: #6CB833;
+            background-color: #405142;
+        }
+        #blob div.applied-rem {
+            color: red;
+        }
+        #messages {
+            position: absolute;
+            top: 0;
+            border: 1px solid red;
+            padding: 5px;
+            left: 900px;
+        }
+        </style>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+        <script type="text/javascript" src="underscore-min.js"></script>
+        <script type="text/javascript">
+        $(function() {
+            
+            /** demo compiled diff code **/
+            changes = {
+                1: [
+                    {
+                        'line': 9,
+                        'replaceWith': ' * Super base class for promo',
+                    },
+                    {
+                        'line': 10,
+                        'replaceWith': ' * Oh yeah lets add another bit here booyeah'
+                    },
+                    {
+                        'line': 12,
+                        'addAfter': ' * a brand new line',
+                        'replaceWith': ' * buttz',
+                    }
+                ],
+                2: [
+                    {
+                        'line': 17,
+                        'replaceWith': ' * Super base class for promo',
+                    },
+                    {
+                        'line': 1,
+                        'replaceWith': ' * Oh yeah lets add another bit here booyeah'
+                    },
+                    {
+                        'line': 140,
+                        'addAfter': ' * a brand new line',
+                        'replaceWith': ' * buttz',
+                    }
+                ]
+            };
+            changes_len = 2;
+            changes_where = 0;
+            
+            codeblock = $('#code');
+            sp = codeblock.text().split("\n");
+            //alert('Changing line 9');
+            /*
+            cb = (function(sp, changes) {
+                sp[8] = ' * banana boat';
+                $('#code').text(sp.join("\n"));
+                alert('changed');
+            })(sp, changes);
+            
+            window.myinterval = window.setInterval(cb, 1000);
+            */
+            // use undascore or something
+            document.svnnumber = 1;
+            inter = window.setInterval(update_area, 2000);
+        });
+        
+        function update_area(line, with_what) {
+            cdiff = document.svnnumber;
+            
+            diff = changes[cdiff]; 
+            
+            // Get from css
+            defaultcss = {
+                'color': '#fff',
+                'background-color': '#22221D',
+            };
+            
+            // delay here
+            for (d in diff) {
+                newline = diff[d];
+                // newline[line, replaceWith]
+                
+                // closure
+                upd = function(data, css) {
+                    
+                    return function() {
+                        // update the line
+                        _id = '#r' + data['line'];                
+                        
+                        m('Updating ' + _id);
+                        
+                        $(_id).addClass('applied-add');
+                        
+                        // What do we want to do
+                        if (_.has(data, 'replaceWith')) {
+                            $(_id).text(data['replaceWith']);
+                        }
+                        if (_.has(data, 'addAfter')) {
+                            // Insert line (ugh then i'd have to rename all IDs)
+                        }
+                        if (_.has(data, 'removeLines')) {
+                            // Remove this and the following X lines
+                        }
+                        
+                        // Gravitate back towards default
+                        $(_id).animate(css, 2000);
+                    }
+                    
+                }(newline, defaultcss);
+                
+                // Where should we scroll to
+                min_id = Math.max(newline['line'] - 2, 1);
+                scrollToId = '#r' + min_id;
+                
+                // Scroll to two lines above, and call upd()
+                // [todo] Make it so it doesn't move if the next diff thing is still on the screen, or basically move it the least possible too, so if its
+                // just out of reach at the bottom, then only scroll a little
+                // [todo] wait until scroll has finished for X seconds before animating
+                $('#blob').animate({                    
+                    scrollTop: $(scrollToId).offset().top
+                }, 1000, upd);
+                
+            }
+            
+            document.svnnumber += 1;
+            if (changes_len == cdiff) {
+                
+                m('cleared interval');
+                window.clearInterval(inter);
+            }
+        }
+        
+        function m(msg) {
+            $('#messages').append('<p>' + msg + '</p>');
+        }
+        </script>
+    </head>
+    <body>
+        <div id="messages">
+        
+        </div>
+        <div id="blob">
+<div class="row_0" id="r1">&lt;?php</div>
+<div class="row_1" id="r2">&nbsp;</div>
+<div class="row_0" id="r3">function load_promo($cls) {</div>
+<div class="row_1" id="r4">    include_once 'promos/'.$cls.'.php';</div>
+<div class="row_0" id="r5">}</div>
+<div class="row_1" id="r6">&nbsp;</div>
+<div class="row_0" id="r7">/** </div>
+<div class="row_1" id="r8"> * Base class for promo.</div>
+<div class="row_0" id="r9"> * </div>
+<div class="row_1" id="r10"> * This will only be loaded if the appropriate promo driver cannot be found, but</div>
+<div class="row_0" id="r11"> * it doesn't really do much on its own. Contains the promo checks that apply to</div>
+<div class="row_1" id="r12"> * all promos, like State check, Country check, Order subtotal checks. These</div>
+<div class="row_0" id="r13"> * are applied to all promos, then promo-specific functions are called.</div>
+<div class="row_1" id="r14"> * </div>
+<div class="row_0" id="r15"> * Should not be called directly, instead use CPAP_Promo::discover([$code]) to </div>
+<div class="row_1" id="r16"> * set it up.</div>
+<div class="row_0" id="r17"> */</div>
+<div class="row_1" id="r18">class CPAP_Promo</div>
+<div class="row_0" id="r19">{</div>
+<div class="row_1" id="r20">    /**</div>
+<div class="row_0" id="r21">     * Hold the static promo code information</div>
+<div class="row_1" id="r22">     */</div>
+<div class="row_0" id="r23">    public $code;</div>
+<div class="row_1" id="r24">    public $prefix;</div>
+<div class="row_0" id="r25">    public $extension;</div>
+<div class="row_1" id="r26">    </div>
+<div class="row_0" id="r27">    /**</div>
+<div class="row_1" id="r28">     * Holds the promo row from PromoCodeTbl. Includes expirations, discount amounts,</div>
+<div class="row_0" id="r29">     * descriptions etc</div>
+<div class="row_1" id="r30">     */</div>
+<div class="row_0" id="r31">    public $data; </div>
+<div class="row_1" id="r32">    </div>
+<div class="row_0" id="r33">    /**</div>
+<div class="row_1" id="r34">     * Holds misc data that we can set.</div>
+<div class="row_0" id="r35">     */</div>
+<div class="row_1" id="r36">    protected $internal_data = array();</div>
+<div class="row_0" id="r37">    </div>
+<div class="row_1" id="r38">    /**</div>
+<div class="row_0" id="r39">     * PromoParmsTbl rows, with the promo requirements like excluded countries,</div>
+<div class="row_1" id="r40">     * minimum order value, or promo-specific ones.</div>
+<div class="row_0" id="r41">     */</div>
+<div class="row_1" id="r42">    public $params;</div>
+<div class="row_0" id="r43">    </div>
+<div class="row_1" id="r44">    /**</div>
+<div class="row_0" id="r45">     * Internal logging, should only be used to keep check of what is happening</div>
+<div class="row_1" id="r46">     * while the promo checks/applies. Not for public error messages.</div>
+<div class="row_0" id="r47">     * </div>
+<div class="row_1" id="r48">     * Called through CPAP_Promo::_log()</div>
+<div class="row_0" id="r49">     */</div>
+<div class="row_1" id="r50">    public $logs; </div>
+<div class="row_0" id="r51">    </div>
+<div class="row_1" id="r52">    public $promo_source = 1; // Same as $promoSource, 1 = cart/checkout, 2= madcow csr apply</div>
+<div class="row_0" id="r53">    </div>
+<div class="row_1" id="r54">    /**</div>
+<div class="row_0" id="r55">     * Whether or not to echo the results of _log() as it's called. Easy</div>
+<div class="row_1" id="r56">     * way is to use $promo-&gt;public_debug = ON_DEV, which will show up on dev only.</div>
+<div class="row_0" id="r57">     */</div>
+<div class="row_1" id="r58">    public $public_debug = false;</div>
+<div class="row_0" id="r59">    </div>
+<div class="row_1" id="r60">    /**</div>
+<div class="row_0" id="r61">     * Internal error code that corresponds to a constant in commonPromoFunctions.</div>
+<div class="row_1" id="r62">     * Retrieved through getErrorCode() and getErrorMessage()</div>
+<div class="row_0" id="r63">     */</div>
+<div class="row_1" id="r64">    protected $error_code; </div>
+<div class="row_0" id="r65">    protected $error_msg;</div>
+<div class="row_1" id="r66">    </div>
+<div class="row_0" id="r67">    /**</div>
+<div class="row_1" id="r68">     * $do_not_discount includes items that should be excluded from discounting,</div>
+<div class="row_0" id="r69">     * eg a Promo that excludes ResMed items will fill up with the item keys.</div>
+<div class="row_1" id="r70">     */</div>
+<div class="row_0" id="r71">    protected $do_not_discount = array(); </div>
+<div class="row_1" id="r72">    protected $do_not_discount_order = false;  </div>
+<div class="row_0" id="r73">    </div>
+<div class="row_1" id="r74">    /**</div>
+<div class="row_0" id="r75">     * Number of items that qualify for this promotion (eg num items - count(do_not_discount)</div>
+<div class="row_1" id="r76">     */</div>
+<div class="row_0" id="r77">    protected $qual_count = array(); </div>
+<div class="row_1" id="r78">    </div>
+<div class="row_0" id="r79">    /**</div>
+<div class="row_1" id="r80">     * NotImplemented</div>
+<div class="row_0" id="r81">     * Set if this promo should then call hint(). Used in cases such as Free Shipping.</div>
+<div class="row_1" id="r82">     * If it only applies to 2 day, and they have selected Ground shipping, then the </div>
+<div class="row_0" id="r83">     * promo is still technically valid, we'll just offer to change their</div>
+<div class="row_1" id="r84">     * shipping choice to the correct one.</div>
+<div class="row_0" id="r85">     */</div>
+<div class="row_1" id="r86">    protected $is_valid_partial = false;</div>
+<div class="row_0" id="r87">    </div>
+<div class="row_1" id="r88">    /**</div>
+<div class="row_0" id="r89">     * Array of changes that were made to this order. Human-readable, designed for </div>
+<div class="row_1" id="r90">     * order notes.</div>
+<div class="row_0" id="r91">     */</div>
+<div class="row_1" id="r92">    protected $order_changes = array();</div>
+<div class="row_0" id="r93">    </div>
+<div class="row_1" id="r94">    /**</div>
+<div class="row_0" id="r95">     * Set to true if a promo was passed in via $_POST or $_GET. If it's read from the session,</div>
+<div class="row_1" id="r96">     * or input, then will stay false. Used to show the success message, but only the first time</div>
+<div class="row_0" id="r97">     * it's added, not every page load.</div>
+<div class="row_1" id="r98">     */</div>
+<div class="row_0" id="r99">    public $set_new_promo = false;</div>
+<div class="row_1" id="r100">    </div>
+<div class="row_0" id="r101">    </div>
+<div class="row_1" id="r102">    /*</div>
+<div class="row_0" id="r103">     * $promo: string containing the promo code</div>
+<div class="row_1" id="r104">     * $info: row from PromoCodeTbl containing things like start, expire, type</div>
+<div class="row_0" id="r105">     * $params: row(s) from PromoParmsTbl, which hold specific requirements relevant to promos</div>
+<div class="row_1" id="r106">     */</div>
+<div class="row_0" id="r107">    public function __construct($promo, $info = null, $params = null) </div>
+<div class="row_1" id="r108">    {  </div>
+<div class="row_0" id="r109">        $this-&gt;valid = true;      </div>
+<div class="row_1" id="r110">        // Does this promo exist?</div>
+<div class="row_0" id="r111">        if (empty($info)) {</div>
+<div class="row_1" id="r112">            $this-&gt;_log('Invalid promo &quot;%s&quot;', $promo);</div>
+<div class="row_0" id="r113">            $this-&gt;valid = false;</div>
+<div class="row_1" id="r114">            return;</div>
+<div class="row_0" id="r115">        }</div>
+<div class="row_1" id="r116">        </div>
+<div class="row_0" id="r117">        $this-&gt;code = $promo;</div>
+<div class="row_1" id="r118">        $this-&gt;prefix = substr($this-&gt;code, 0, 3);</div>
+<div class="row_0" id="r119">        $this-&gt;extension = substr($this-&gt;code, 3);</div>
+<div class="row_1" id="r120">        </div>
+<div class="row_0" id="r121">        if (is_array($info) &amp;&amp; count($info) &gt; 0) {</div>
+<div class="row_1" id="r122">            $this-&gt;data = $info;</div>
+<div class="row_0" id="r123">        }</div>
+<div class="row_1" id="r124">    }</div>
+<div class="row_0" id="r125">    </div>
+<div class="row_1" id="r126">    public function getCode() </div>
+<div class="row_0" id="r127">    {</div>
+<div class="row_1" id="r128">        return $this-&gt;code;</div>
+<div class="row_0" id="r129">    }</div>
+<div class="row_1" id="r130">    </div>
+<div class="row_0" id="r131">    public function getPrefix() </div>
+<div class="row_1" id="r132">    {</div>
+<div class="row_0" id="r133">        return $this-&gt;prefix;</div>
+<div class="row_1" id="r134">    }</div>
+<div class="row_0" id="r135">    </div>
+<div class="row_1" id="r136">    public function is_valid_partial() </div>
+<div class="row_0" id="r137">    {</div>
+<div class="row_1" id="r138">        return $this-&gt;is_valid_partial === true;</div>
+<div class="row_0" id="r139">    }</div>
+<div class="row_1" id="r140">    </div>
+<div class="row_0" id="r141">    /**</div>
+<div class="row_1" id="r142">     * Detect promo</div>
+<div class="row_0" id="r143">     * </div>
+<div class="row_1" id="r144">     * Checks $_SESSION, $_POST and $_GET, but can be overridden by passing</div>
+<div class="row_0" id="r145">     * in a code (which is done on shopping-cart to get $oldpromo.</div>
+<div class="row_1" id="r146">     * </div>
+<div class="row_0" id="r147">     * This should be called to instantiate everything, as it also loads the</div>
+<div class="row_1" id="r148">     * relevant promo info, and the child classes associated with the promo type.</div>
+<div class="row_0" id="r149">     * </div>
+<div class="row_1" id="r150">     * If it can't find a child class, then it returns an instance of </div>
+<div class="row_0" id="r151">     * CPAP_Promo which just runs through the basic checks and doesn't alter</div>
+<div class="row_1" id="r152">     * the order in any way.</div>
+<div class="row_0" id="r153">     */</div>
+<div class="row_1" id="r154">    static function discover($code = null) </div>
+<div class="row_0" id="r155">    {</div>
+<div class="row_1" id="r156">        $set_new_promo = false;</div>
+<div class="row_0" id="r157">        if (is_null($code)) {</div>
+<div class="row_1" id="r158">            if (isset($_SESSION['cpap-discount-code'])) {</div>
+<div class="row_0" id="r159">                $code = $_SESSION['cpap-discount-code'];</div>
+<div class="row_1" id="r160">            }</div>
+<div class="row_0" id="r161">            if (isset($_GET['PromotionCode'])) {</div>
+<div class="row_1" id="r162">                $set_new_promo = true;</div>
+<div class="row_0" id="r163">                $code = $_GET['PromotionCode'];</div>
+<div class="row_1" id="r164">            }</div>
+<div class="row_0" id="r165">            if (isset($_POST['PromotionCode'])) {</div>
+<div class="row_1" id="r166">                $set_new_promo = true;</div>
+<div class="row_0" id="r167">                $code = $_POST['PromotionCode'];</div>
+<div class="row_1" id="r168">            }</div>
+<div class="row_0" id="r169">            if (isset($_GET['np'])) {</div>
+<div class="row_1" id="r170">                $set_new_promo = true;</div>
+<div class="row_0" id="r171">            }</div>
+<div class="row_1" id="r172">        }</div>
+<div class="row_0" id="r173">                </div>
+<div class="row_1" id="r174">        // Inject the required info</div>
+<div class="row_0" id="r175">        $info = promo_get_info($code);</div>
+<div class="row_1" id="r176">        if ($info === false) {</div>
+<div class="row_0" id="r177">            $promo = new CPAP_Promo($code, $info); // Will be an &quot;invalid&quot; instance</div>
+<div class="row_1" id="r178">            $promo-&gt;set_new_promo = $set_new_promo;</div>
+<div class="row_0" id="r179">            return $promo;</div>
+<div class="row_1" id="r180">        }</div>
+<div class="row_0" id="r181">        </div>
+<div class="row_1" id="r182">        //</div>
+<div class="row_0" id="r183">        $cls = $info['class'];</div>
+<div class="row_1" id="r184">        </div>
+<div class="row_0" id="r185">        try {</div>
+<div class="row_1" id="r186">            load_promo($cls); // include class file</div>
+<div class="row_0" id="r187">            $promo = new $cls($code, $info); // create instance of PromoType, eg &quot;PercentPromo&quot;</div>
+<div class="row_1" id="r188">        } catch (Exception $e) {</div>
+<div class="row_0" id="r189">            $promo = new CPAP_Promo($code, $info); // fallback to default promo with zero optional params</div>
+<div class="row_1" id="r190">        }</div>
+<div class="row_0" id="r191">        </div>
+<div class="row_1" id="r192">        $promo-&gt;params = promo_get_params($info['PCID']);</div>
+<div class="row_0" id="r193">        $promo-&gt;set_new_promo = $set_new_promo;</div>
+<div class="row_1" id="r194">        </div>
+<div class="row_0" id="r195">        // Set shipping method/other internal_data items</div>
+<div class="row_1" id="r196">        // Will be overridden if necessary</div>
+<div class="row_0" id="r197">        $promo-&gt;set_data('shipping_method', $_SESSION['shopping-cart']['ShippingMethod']);</div>
+<div class="row_1" id="r198">        $promo-&gt;set_data('shipping_state', $_SESSION['shopping-cart']['MState']);</div>
+<div class="row_0" id="r199">        $promo-&gt;set_data('shipping_country', $_SESSION['shopping-cart']['MCountry']);</div>
+<div class="row_1" id="r200">        $promo-&gt;set_data('shipping_cost', $_SESSION['shopping-cart']['ShipCost']);</div>
+<div class="row_0" id="r201">        </div>
+<div class="row_1" id="r202">        return $promo;</div>
+<div class="row_0" id="r203">    }</div>
+<div class="row_1" id="r204">    </div>
+<div class="row_0" id="r205">    /**</div>
+<div class="row_1" id="r206">     * Create a promo on the fly.</div>
+<div class="row_0" id="r207">     * </div>
+<div class="row_1" id="r208">     * Used in tests, similar to discover but instead of retrieving from the db,</div>
+<div class="row_0" id="r209">     * we pass in any conditions we want to test varying types of promos.</div>
+<div class="row_1" id="r210">     * </div>
+<div class="row_0" id="r211">     * Defaults to active, running from 2000 to 2099, with 23%/$23 off.</div>
+<div class="row_1" id="r212">     * </div>
+<div class="row_0" id="r213">     * Code is just faked because it doesn't matter in any way. This should</div>
+<div class="row_1" id="r214">     * only be used in tests.</div>
+<div class="row_0" id="r215">     */</div>
+<div class="row_1" id="r216">    static function mock($vars) </div>
+<div class="row_0" id="r217">    {        </div>
+<div class="row_1" id="r218">        // Get information from vars array relevant to our fake promo</div>
+<div class="row_0" id="r219">        $info = array();</div>
+<div class="row_1" id="r220">        $extract = array('PCID', 'DiscountType', 'DiscountAmount', 'DiscountLevel',</div>
+<div class="row_0" id="r221">                          'DateStart', 'DateExpire', 'DiscountDescription', 'FlagMain');</div>
+<div class="row_1" id="r222">        foreach ($extract as $e) {</div>
+<div class="row_0" id="r223">            if (array_key_exists($e, $vars)) {</div>
+<div class="row_1" id="r224">                $info[$e] = $vars[$e];</div>
+<div class="row_0" id="r225">            }</div>
+<div class="row_1" id="r226">        }</div>
+<div class="row_0" id="r227">        $info['_skip_validity'] = true;</div>
+<div class="row_1" id="r228">        </div>
+<div class="row_0" id="r229">        // Add some defaults if they don't exist, so we don't have to specify them every time in tests</div>
+<div class="row_1" id="r230">        if (!isset($vars['code'])) {</div>
+<div class="row_0" id="r231">            $code = 'internal.mock.'.rand(1000,9999);</div>
+<div class="row_1" id="r232">        } else {</div>
+<div class="row_0" id="r233">            $code = 'internal.mock.'.$vars['code'];</div>
+<div class="row_1" id="r234">        }        </div>
+<div class="row_0" id="r235">        </div>
+<div class="row_1" id="r236">        if (!isset($info['FlagMain'])) {</div>
+<div class="row_0" id="r237">            $info['FlagMain'] = 1;</div>
+<div class="row_1" id="r238">        }</div>
+<div class="row_0" id="r239">        if (!isset($info['DateExpire'])) {</div>
+<div class="row_1" id="r240">            $info['DateExpire'] = '2099-01-01 00:00:00';</div>
+<div class="row_0" id="r241">        }</div>
+<div class="row_1" id="r242">        if (!isset($info['DateStart'])) {</div>
+<div class="row_0" id="r243">            $info['DateStart'] = '2000-01-01 00:00:00';</div>
+<div class="row_1" id="r244">        }</div>
+<div class="row_0" id="r245">        if (!isset($info['DiscountAmount'])) {</div>
+<div class="row_1" id="r246">            $info['DiscountAmount'] = 23;</div>
+<div class="row_0" id="r247">        }</div>
+<div class="row_1" id="r248">        </div>
+<div class="row_0" id="r249">        // Load custom promo class</div>
+<div class="row_1" id="r250">        try {</div>
+<div class="row_0" id="r251">            $cls = $vars['type'];</div>
+<div class="row_1" id="r252">            load_promo($cls);</div>
+<div class="row_0" id="r253">            $promo = new $cls($code, $info);</div>
+<div class="row_1" id="r254">        } catch (Exception $e) {</div>
+<div class="row_0" id="r255">            $promo = new CPAP_Promo($code, $info);</div>
+<div class="row_1" id="r256">        }</div>
+<div class="row_0" id="r257">        </div>
+<div class="row_1" id="r258">        if (array_key_exists('params', $vars)) {</div>
+<div class="row_0" id="r259">            $promo-&gt;params = $vars['params'];</div>
+<div class="row_1" id="r260">        } else {</div>
+<div class="row_0" id="r261">            $promo-&gt;params = array();</div>
+<div class="row_1" id="r262">        }</div>
+<div class="row_0" id="r263">        </div>
+<div class="row_1" id="r264">        if (isset($vars['ShippingMethod'])) {</div>
+<div class="row_0" id="r265">            $promo-&gt;set_data('shipping_method', $vars['ShippingMethod']);</div>
+<div class="row_1" id="r266">        }</div>
+<div class="row_0" id="r267">        if (isset($vars['MState'])) {</div>
+<div class="row_1" id="r268">            $promo-&gt;set_data('shipping_state', $vars['MState']);</div>
+<div class="row_0" id="r269">        }</div>
+<div class="row_1" id="r270">        if (isset($vars['MCountry'])) {</div>
+<div class="row_0" id="r271">            $promo-&gt;set_data('shipping_country', $vars['MCountry']);</div>
+<div class="row_1" id="r272">        }</div>
+<div class="row_0" id="r273">        if (isset($vars['ShipCost'])) {</div>
+<div class="row_1" id="r274">            $promo-&gt;set_data('shipping_cost', $vars['ShipCost']);</div>
+<div class="row_0" id="r275">        }</div>
+<div class="row_1" id="r276">        </div>
+<div class="row_0" id="r277">        return $promo;</div>
+<div class="row_1" id="r278">    }</div>
+<div class="row_0" id="r279">    </div>
+<div class="row_1" id="r280">    /**</div>
+<div class="row_0" id="r281">     * Set data for promo.</div>
+<div class="row_1" id="r282">     * </div>
+<div class="row_0" id="r283">     * Can set any arbitrary data such as undo data (anything a promo needs to undo itself,</div>
+<div class="row_1" id="r284">     * like original shipping price).</div>
+<div class="row_0" id="r285">     * </div>
+<div class="row_1" id="r286">     * Also used for passing in session data, instead of accessing $_SESSION directly,</div>
+<div class="row_0" id="r287">     * which makes it possible to fake the session in Tests.</div>
+<div class="row_1" id="r288">     */</div>
+<div class="row_0" id="r289">    public function set_data($key, $value) {</div>
+<div class="row_1" id="r290">        $this-&gt;_log('Setting internal_data[%s] = %s', $key, $value);</div>
+<div class="row_0" id="r291">        $this-&gt;internal_data[$key] = $value;</div>
+<div class="row_1" id="r292">        </div>
+<div class="row_0" id="r293">        $subkey = sprintf('promo-%s-%s', get_class($this), $this-&gt;code);</div>
+<div class="row_1" id="r294">        </div>
+<div class="row_0" id="r295">        /**</div>
+<div class="row_1" id="r296">         * Merge data, don't overwrite.</div>
+<div class="row_0" id="r297">         * If one page load updates a price to $5, and the next one</div>
+<div class="row_1" id="r298">         * (after changing the order) updates another to $7, only the $7</div>
+<div class="row_0" id="r299">         * would be saved in session</div>
+<div class="row_1" id="r300">         */</div>
+<div class="row_0" id="r301">        </div>
+<div class="row_1" id="r302">        // Special cases, this is getting pretty ugly</div>
+<div class="row_0" id="r303">        if ($key == 'shipping_cost') {</div>
+<div class="row_1" id="r304">            $_SESSION['shopping-cart']['ShipCost'] = $value;</div>
+<div class="row_0" id="r305">        } </div>
+<div class="row_1" id="r306">        if ($key == 'shipping_method') {</div>
+<div class="row_0" id="r307">            $_SESSION['shopping-cart']['ShippingMethod'] = $value;</div>
+<div class="row_1" id="r308">        }</div>
+<div class="row_0" id="r309">        </div>
+<div class="row_1" id="r310">        $_SESSION['shopping-cart'][$subkey][$key] = $value;            </div>
+<div class="row_0" id="r311">        </div>
+<div class="row_1" id="r312">        return true;</div>
+<div class="row_0" id="r313">    }</div>
+<div class="row_1" id="r314">    </div>
+<div class="row_0" id="r315">    public function get_data($key) {</div>
+<div class="row_1" id="r316">        if (!empty($this-&gt;internal_data[$key])) {</div>
+<div class="row_0" id="r317">            return $this-&gt;internal_data[$key]; // </div>
+<div class="row_1" id="r318">        }</div>
+<div class="row_0" id="r319">        $subkey = sprintf('promo-%s-%s', get_class($this), $this-&gt;code);</div>
+<div class="row_1" id="r320">        return $_SESSION['shopping-cart'][$subkey][$key];</div>
+<div class="row_0" id="r321">    }</div>
+<div class="row_1" id="r322">    </div>
+<div class="row_0" id="r323">    protected function clear_data($key) </div>
+<div class="row_1" id="r324">    {</div>
+<div class="row_0" id="r325">        $subkey = sprintf('promo-%s-%s', get_class($this), $this-&gt;code);</div>
+<div class="row_1" id="r326">        $this-&gt;_log('Clearing data: %s', $key);</div>
+<div class="row_0" id="r327">        unset($_SESSION['shopping-cart'][$subkey][$key]);</div>
+<div class="row_1" id="r328">    }</div>
+<div class="row_0" id="r329">    </div>
+<div class="row_1" id="r330">    /**</div>
+<div class="row_0" id="r331">     * Add note to order for order notes in Madcow, or return the entire thing.</div>
+<div class="row_1" id="r332">     * </div>
+<div class="row_0" id="r333">     * To return, just implode shopping-cart[order_changes]</div>
+<div class="row_1" id="r334">     */</div>
+<div class="row_0" id="r335">    // [todo] this might be able to use set_data too</div>
+<div class="row_1" id="r336">    public function add_order_change($key = null, $text = null) {</div>
+<div class="row_0" id="r337">        if (!is_null($text)) {</div>
+<div class="row_1" id="r338">            $this-&gt;_log('Updating order_changes with: %s', $text);</div>
+<div class="row_0" id="r339">            $_SESSION['shopping-cart']['order_changes'][$key] = $text;</div>
+<div class="row_1" id="r340">        }</div>
+<div class="row_0" id="r341">    }</div>
+<div class="row_1" id="r342">    </div>
+<div class="row_0" id="r343">    /**</div>
+<div class="row_1" id="r344">     * Returns true/false whether the check failed, but we'll show them a hint to continue.</div>
+<div class="row_0" id="r345">     * </div>
+<div class="row_1" id="r346">     * FreeShipping will show a hint if shipping method fails, to allow them to change to </div>
+<div class="row_0" id="r347">     * the correct one.</div>
+<div class="row_1" id="r348">     */</div>
+<div class="row_0" id="r349">    </div>
+<div class="row_1" id="r350">    /**</div>
+<div class="row_0" id="r351">     * Set a specified constant error code. Can be retrieved by getErrorCode()</div>
+<div class="row_1" id="r352">     */</div>
+<div class="row_0" id="r353">    protected function _set_error($errcode = PROMO_ERROR_INVALID) </div>
+<div class="row_1" id="r354">    {</div>
+<div class="row_0" id="r355">        $this-&gt;error_code = $errcode;</div>
+<div class="row_1" id="r356">        return $errcode;</div>
+<div class="row_0" id="r357">    }</div>
+<div class="row_1" id="r358">    </div>
+<div class="row_0" id="r359">    public function getErrorCode() </div>
+<div class="row_1" id="r360">    {</div>
+<div class="row_0" id="r361">        return $this-&gt;error_code;</div>
+<div class="row_1" id="r362">    }</div>
+<div class="row_0" id="r363">    </div>
+<div class="row_1" id="r364">    public function getErrorMessage($type = 'frontend') </div>
+<div class="row_0" id="r365">    {</div>
+<div class="row_1" id="r366">        // If it's partially valid, don't show an error?</div>
+<div class="row_0" id="r367">&nbsp;</div>
+<div class="row_1" id="r368">        return globalPromoGetErrorMessage($this-&gt;error_code, $type);</div>
+<div class="row_0" id="r369">    }</div>
+<div class="row_1" id="r370">    </div>
+<div class="row_0" id="r371">    public function has_started() </div>
+<div class="row_1" id="r372">    {</div>
+<div class="row_0" id="r373">        return strtotime($this-&gt;data['DateStart']) &lt; time();</div>
+<div class="row_1" id="r374">    }</div>
+<div class="row_0" id="r375">    </div>
+<div class="row_1" id="r376">    public function has_ended() </div>
+<div class="row_0" id="r377">    {</div>
+<div class="row_1" id="r378">        return strtotime($this-&gt;data['DateExpire']) &lt; time();</div>
+<div class="row_0" id="r379">    }</div>
+<div class="row_1" id="r380">    </div>
+<div class="row_0" id="r381">    /**</div>
+<div class="row_1" id="r382">     * Return true/false whether this promo is a type of the provided int</div>
+<div class="row_0" id="r383">     * $promo-&gt;is_type(PROMO_TYPE_SHIPPING)</div>
+<div class="row_1" id="r384">     */</div>
+<div class="row_0" id="r385">    public function is_type($type) {</div>
+<div class="row_1" id="r386">        return ($this-&gt;id == $type);</div>
+<div class="row_0" id="r387">    }</div>
+<div class="row_1" id="r388">    </div>
+<div class="row_0" id="r389">    /**</div>
+<div class="row_1" id="r390">     * Check function. </div>
+<div class="row_0" id="r391">     * </div>
+<div class="row_1" id="r392">     * Promos require this to be defined. This function returns true if the promo is capable of being applied</div>
+<div class="row_0" id="r393">     * to the passed order. For example, a promo might require 2 specific PNums, and would check to make</div>
+<div class="row_1" id="r394">     * sure they were in the parts array. If this fails, then apply() won't be called. When it fails</div>
+<div class="row_0" id="r395">     * (returns non-true) it should return an error code and set the $error_code attribute.</div>
+<div class="row_1" id="r396">     * </div>
+<div class="row_0" id="r397">     * In promo specific classes, this must call parent::check($order) first, which runs through the general params,</div>
+<div class="row_1" id="r398">     * like start, end, inclusions and exclusions for state/category etc. If parent::check returns an error code,</div>
+<div class="row_0" id="r399">     * then return that, and then attempt promo-specific checks.</div>
+<div class="row_1" id="r400">     * </div>
+<div class="row_0" id="r401">     * $order is the $shoppingCart/global cart array from shoppingCartFunctions.php. It's passed by value because</div>
+<div class="row_1" id="r402">     * we aren't modifying it in any way, and should only be used to compare. This function should also be safe to call </div>
+<div class="row_0" id="r403">     * multiple times without changing anything.</div>
+<div class="row_1" id="r404">     * </div>
+<div class="row_0" id="r405">     * Returns: true if we can apply(), otherwise an error code so we can retrieve the message.</div>
+<div class="row_1" id="r406">     */</div>
+<div class="row_0" id="r407">    function check($order) </div>
+<div class="row_1" id="r408">    {</div>
+<div class="row_0" id="r409">        $this-&gt;_log('Called CPAP_Promo::check');</div>
+<div class="row_1" id="r410">        </div>
+<div class="row_0" id="r411">        if (!$this-&gt;valid) {</div>
+<div class="row_1" id="r412">            $this-&gt;_log('Promo invalid');</div>
+<div class="row_0" id="r413">            $this-&gt;_set_error(PROMO_ERROR_INVALID);</div>
+<div class="row_1" id="r414">            return false;</div>
+<div class="row_0" id="r415">        }</div>
+<div class="row_1" id="r416">        </div>
+<div class="row_0" id="r417">        // Check if this is a one time use code, and if it's been used yet</div>
+<div class="row_1" id="r418">        if ($this-&gt;data['FlagMain'] == 0) {</div>
+<div class="row_0" id="r419">            // Single use</div>
+<div class="row_1" id="r420">            if (intval($this-&gt;data['Order_Num']) !== 0) {</div>
+<div class="row_0" id="r421">                // Already used</div>
+<div class="row_1" id="r422">                $this-&gt;_log('Promo is a one time use code that has been used');</div>
+<div class="row_0" id="r423">                $this-&gt;_set_error(PROMO_ERROR_USED);</div>
+<div class="row_1" id="r424">                return false;</div>
+<div class="row_0" id="r425">            }</div>
+<div class="row_1" id="r426">        }</div>
+<div class="row_0" id="r427">    </div>
+<div class="row_1" id="r428">        // Is this promo currently active</div>
+<div class="row_0" id="r429">        if ($this-&gt;has_started() === false) {</div>
+<div class="row_1" id="r430">            $this-&gt;_log(&quot;Promo has not started, starts: %s, current: %s&quot;, strtotime($this-&gt;data['DateStart']), time());</div>
+<div class="row_0" id="r431">            $this-&gt;_set_error(PROMO_ERROR_STARTED);</div>
+<div class="row_1" id="r432">            return false;</div>
+<div class="row_0" id="r433">        }</div>
+<div class="row_1" id="r434">        if ($this-&gt;has_ended() !== false) {</div>
+<div class="row_0" id="r435">            $this-&gt;_log(&quot;Promo has ended, starts: %s, current: %s&quot;, strtotime($this-&gt;data['DateExpire']), time());</div>
+<div class="row_1" id="r436">            $this-&gt;_set_error(PROMO_ERROR_ENDED);</div>
+<div class="row_0" id="r437">            return false;</div>
+<div class="row_1" id="r438">        }</div>
+<div class="row_0" id="r439">        </div>
+<div class="row_1" id="r440">        // Active promo</div>
+<div class="row_0" id="r441">        // Check parameters</div>
+<div class="row_1" id="r442">        $result = true;</div>
+<div class="row_0" id="r443">        $check_amount = $qual_count = $min = $max = false;</div>
+<div class="row_1" id="r444">        foreach ($this-&gt;params as $row) {</div>
+<div class="row_0" id="r445">            $value = $row['ParameterValue1'];</div>
+<div class="row_1" id="r446">            $desc = $row['ParameterDesc'];</div>
+<div class="row_0" id="r447">            switch ($row['ParameterDesc']) {</div>
+<div class="row_1" id="r448">                case 'IncludeMfg':</div>
+<div class="row_0" id="r449">                case 'ExcludeMfg':</div>
+<div class="row_1" id="r450">                    $result = $this-&gt;check_mfg($order, $value, $desc);</div>
+<div class="row_0" id="r451">                    break;    </div>
+<div class="row_1" id="r452">                case 'IncludeCat':</div>
+<div class="row_0" id="r453">                case 'ExcludeCat':</div>
+<div class="row_1" id="r454">                    $result = $this-&gt;check_cat($order, $value, $desc);</div>
+<div class="row_0" id="r455">                    break;</div>
+<div class="row_1" id="r456">                case 'IncludePart':</div>
+<div class="row_0" id="r457">                case 'ExcludePart':</div>
+<div class="row_1" id="r458">                    $result = $this-&gt;check_parts($order, $value, $desc);</div>
+<div class="row_0" id="r459">                    break;</div>
+<div class="row_1" id="r460">                case 'IncludeState':</div>
+<div class="row_0" id="r461">                case 'ExcludeState':</div>
+<div class="row_1" id="r462">                case 'IncludeCountry':</div>
+<div class="row_0" id="r463">                case 'ExcludeCountry':</div>
+<div class="row_1" id="r464">                    $result = $this-&gt;check_state_country($order, $value, $desc);</div>
+<div class="row_0" id="r465">                    break;</div>
+<div class="row_1" id="r466">                case 'MinOrder':</div>
+<div class="row_0" id="r467">                    // Don't check the order amount right away -- we want </div>
+<div class="row_1" id="r468">                    // to wait for all filters to process first so we only</div>
+<div class="row_0" id="r469">                    // account for the allowable products</div>
+<div class="row_1" id="r470">                    $check_amount = true;</div>
+<div class="row_0" id="r471">                    $MinOrder = floatval($value);</div>
+<div class="row_1" id="r472">                    break;</div>
+<div class="row_0" id="r473">                case 'MinQualCount': // [not implemented]s return PROMO_ERR_QTY if it fails</div>
+<div class="row_1" id="r474">                case 'MaxQualCount':</div>
+<div class="row_0" id="r475">                    $qual_count = true;</div>
+<div class="row_1" id="r476">                    $qual_required = $value;</div>
+<div class="row_0" id="r477">                    $which = strtolower(substr($desc, 0, 3)); // 'min' or 'max'</div>
+<div class="row_1" id="r478">                    $this-&gt;qual_count[$which] = $value;</div>
+<div class="row_0" id="r479">                    //We would like to make sure a certain number of items</div>
+<div class="row_1" id="r480">                    //passed all the filter checking</div>
+<div class="row_0" id="r481">                //This will limit how many of those items will actually be</div>
+<div class="row_1" id="r482">                //discounted'</div>
+<div class="row_0" id="r483">                    break;</div>
+<div class="row_1" id="r484">                // Check if the order is within the specified min and/or max</div>
+<div class="row_0" id="r485">                // Set the variables and check after</div>
+<div class="row_1" id="r486">                case 'LowOrder':</div>
+<div class="row_0" id="r487">                    $min = $value;</div>
+<div class="row_1" id="r488">                    break;</div>
+<div class="row_0" id="r489">                case 'HighOrder':</div>
+<div class="row_1" id="r490">                    $max = $value;</div>
+<div class="row_0" id="r491">                    break;</div>
+<div class="row_1" id="r492">                default:</div>
+<div class="row_0" id="r493">                    // Not a verification parameter -- most likely a value used on other</div>
+<div class="row_1" id="r494">                    // functionality of the promo</div>
+<div class="row_0" id="r495">                    break;</div>
+<div class="row_1" id="r496">            }</div>
+<div class="row_0" id="r497">        }</div>
+<div class="row_1" id="r498">        </div>
+<div class="row_0" id="r499">        // do_not_discount has been populated, check if everything is non-discountable       </div>
+<div class="row_1" id="r500">        if (count($this-&gt;do_not_discount) &gt;= count($order['Parts'])) {</div>
+<div class="row_0" id="r501">            $this-&gt;_log('count() of do_not_discount is the same or more than the number of parts in the order');</div>
+<div class="row_1" id="r502">            $this-&gt;_set_error(PROMO_ERROR_INELIGIBLE);</div>
+<div class="row_0" id="r503">            return false;</div>
+<div class="row_1" id="r504">        }</div>
+<div class="row_0" id="r505">        </div>
+<div class="row_1" id="r506">        if ($this-&gt;do_not_discount_order === true) {</div>
+<div class="row_0" id="r507">            $this-&gt;_log('do_not_discount_order=True');</div>
+<div class="row_1" id="r508">            return false;</div>
+<div class="row_0" id="r509">        }</div>
+<div class="row_1" id="r510">        </div>
+<div class="row_0" id="r511">        // Is there a request to check the minimum order amount?</div>
+<div class="row_1" id="r512">        if ($check_amount){</div>
+<div class="row_0" id="r513">            $this-&gt;check_order_amount($order, $MinOrder);</div>
+<div class="row_1" id="r514">        } </div>
+<div class="row_0" id="r515">        </div>
+<div class="row_1" id="r516">        // Do we need to check the range of the order (this seems to duplicate above, but for now I'll leave it)</div>
+<div class="row_0" id="r517">        if ($min || $max) {</div>
+<div class="row_1" id="r518">            $result = $this-&gt;check_order_range($order, $min, $max);</div>
+<div class="row_0" id="r519">            if ($result !== true) {</div>
+<div class="row_1" id="r520">                $this-&gt;_set_error($result);</div>
+<div class="row_0" id="r521">                return false;</div>
+<div class="row_1" id="r522">            }</div>
+<div class="row_0" id="r523">        }</div>
+<div class="row_1" id="r524">        </div>
+<div class="row_0" id="r525">        // Do we need to check if there's a minimum number of items required in the order?</div>
+<div class="row_1" id="r526">        if ($qual_count &amp;&amp; array_key_exists('min', $this-&gt;qual_count)) {</div>
+<div class="row_0" id="r527">            $this-&gt;_log('Checking qualified count, need %s', $qual_required);</div>
+<div class="row_1" id="r528">            $qty = 0;</div>
+<div class="row_0" id="r529">            foreach ($order['Parts'] as $part) {</div>
+<div class="row_1" id="r530">                if (!in_array($part['key'], $this-&gt;do_not_discount)) {</div>
+<div class="row_0" id="r531">                    $qty += $part['quantity'];</div>
+<div class="row_1" id="r532">                }</div>
+<div class="row_0" id="r533">            }</div>
+<div class="row_1" id="r534">            $this-&gt;_log('Found a total of %s', $qty);</div>
+<div class="row_0" id="r535">            if ($qty &lt; $this-&gt;qual_count['min']) {</div>
+<div class="row_1" id="r536">                $this-&gt;_set_error(PROMO_ERROR_QTY);</div>
+<div class="row_0" id="r537">                return false;</div>
+<div class="row_1" id="r538">            }</div>
+<div class="row_0" id="r539">        }</div>
+<div class="row_1" id="r540">        </div>
+<div class="row_0" id="r541">        // Check the range of the order</div>
+<div class="row_1" id="r542">                </div>
+<div class="row_0" id="r543">/*</div>
+<div class="row_1" id="r544">            //if there's a free shipping add on - don't care if there aren't parts to discount</div>
+<div class="row_0" id="r545">            if( !$blnDiscount &amp;&amp; (!empty($FreeShippingPCID) or !empty($FreeShippingPromoFlag)) ){</div>
+<div class="row_1" id="r546">                $blnDiscount=true;</div>
+<div class="row_0" id="r547">            }</div>
+<div class="row_1" id="r548">&nbsp;</div>
+<div class="row_0" id="r549">        */</div>
+<div class="row_1" id="r550">        return true; // Run checks in here, but don't update the order/cart</div>
+<div class="row_0" id="r551">    }</div>
+<div class="row_1" id="r552">    </div>
+<div class="row_0" id="r553">    /*</div>
+<div class="row_1" id="r554">     * Apply function</div>
+<div class="row_0" id="r555">     * </div>
+<div class="row_1" id="r556">     * Implemented in child classes, this should modify the order itself, and should </div>
+<div class="row_0" id="r557">     * only be called if check() returns true.</div>
+<div class="row_1" id="r558">     * </div>
+<div class="row_0" id="r559">     * This should be overwritten in the child promo classes. It's up to the classes to decide</div>
+<div class="row_1" id="r560">     * how to affect the order. Free shipping promo won't even touch the $order, since it mainly </div>
+<div class="row_0" id="r561">     * changes $_SESSION. Percentage off will update the item prices in $order.</div>
+<div class="row_1" id="r562">     * </div>
+<div class="row_0" id="r563">     * Not a requirement, but if necessary, apply() should also call undo_data($data), to store</div>
+<div class="row_1" id="r564">     * backup data in the session in case the promo needs to be undone. This can be anything</div>
+<div class="row_0" id="r565">     * that is needed to revert the effects of the promo.</div>
+<div class="row_1" id="r566">     */</div>
+<div class="row_0" id="r567">    public function apply(&amp;$order) {        </div>
+<div class="row_1" id="r568">        // Check if this promo has a free shipping aspect. That if the ship method matches, we'll apply</div>
+<div class="row_0" id="r569">        // free shipping, on top of the normal promo stuff.</div>
+<div class="row_1" id="r570">        if (!empty($this-&gt;data['FreeShippingPCID'])) {</div>
+<div class="row_0" id="r571">            </div>
+<div class="row_1" id="r572">            $getPromos = &quot;SELECT p.PCID,concat(CodePrefix, CodeExtension)</div>
+<div class="row_0" id="r573">                FROM PromoCodeTbl p </div>
+<div class="row_1" id="r574">                    INNER JOIN PromoBridgeTbl br ON p.PCID = br.PCID AND br.FlagMain=1</div>
+<div class="row_0" id="r575">                WHERE p.PCID=&quot;.intval($this-&gt;data['FreeShippingPCID']); </div>
+<div class="row_1" id="r576">            $resultPromos = ConnectToDatabase($getPromos);</div>
+<div class="row_0" id="r577">            list($eachPCID, $FreeShippingPromoCode) = mysql_fetch_row($resultPromos);</div>
+<div class="row_1" id="r578">            </div>
+<div class="row_0" id="r579">            $subpromo = CPAP_Promo::discover($FreeShippingPromoCode);</div>
+<div class="row_1" id="r580">            $subpromo-&gt;apply($order);</div>
+<div class="row_0" id="r581">        }</div>
+<div class="row_1" id="r582">    }</div>
+<div class="row_0" id="r583">    </div>
+<div class="row_1" id="r584">    // CSR side apply</div>
+<div class="row_0" id="r585">    public function admin_apply($order, $Order_Num) {}</div>
+<div class="row_1" id="r586">    </div>
+<div class="row_0" id="r587">    // OrderFunction.php, usually update the db, similar to admin apply really</div>
+<div class="row_1" id="r588">    public function order_apply($order, $Order_Num, $extras = array()) {}</div>
+<div class="row_0" id="r589">    </div>
+<div class="row_1" id="r590">    /**</div>
+<div class="row_0" id="r591">     * Undo function</div>
+<div class="row_1" id="r592">     * </div>
+<div class="row_0" id="r593">     * Implemented in child classes, this should modify the order itself.</div>
+<div class="row_1" id="r594">     * </div>
+<div class="row_0" id="r595">     * Any relevant undo data should be retrieved via undo_data(), and cleared after undo() is </div>
+<div class="row_1" id="r596">     * successful.</div>
+<div class="row_0" id="r597">     * </div>
+<div class="row_1" id="r598">     * eg Free Shipping will store the previous shipping cost in undo_data(), and undo() will</div>
+<div class="row_0" id="r599">     * revert the ShippingCost to that. It can also store any items added to the order,</div>
+<div class="row_1" id="r600">     * and then undo() will delete them from the order (which is why we pass by ref).</div>
+<div class="row_0" id="r601">     */</div>
+<div class="row_1" id="r602">    public function undo(&amp;$order) {}</div>
+<div class="row_0" id="r603">    </div>
+<div class="row_1" id="r604">    /**</div>
+<div class="row_0" id="r605">     * Parameter checks (like checkMFG(), checkCountry())</div>
+<div class="row_1" id="r606">     * Copied from commonPromoFuncs:checkMFG()</div>
+<div class="row_0" id="r607">     */</div>
+<div class="row_1" id="r608">    private function check_mfg($order, $mfgs, $type, $apply = false) </div>
+<div class="row_0" id="r609">    {</div>
+<div class="row_1" id="r610">        $this-&gt;_log('Called CPAP_Promo::check_mfg with values %s, %s, %s', $mfgs, $type, $apply);</div>
+<div class="row_0" id="r611">        </div>
+<div class="row_1" id="r612">        $include = ($type == 'IncludeMfg');</div>
+<div class="row_0" id="r613">        $exclude = ($type == 'ExcludeMfg');</div>
+<div class="row_1" id="r614">&nbsp;</div>
+<div class="row_0" id="r615">        // Set up valid MFG array</div>
+<div class="row_1" id="r616">        $mfgArr = explode('|', $mfgs);</div>
+<div class="row_0" id="r617">        $mfgArr = array_map('strtoupper', $mfgArr);        </div>
+<div class="row_1" id="r618">        </div>
+<div class="row_0" id="r619">        // Generate a nice looking string in case we have an error message</div>
+<div class="row_1" id="r620">        // Turns A|B|C|D into A, B, C or D</div>
+<div class="row_0" id="r621">        $mfgListStr = $mfgs;</div>
+<div class="row_1" id="r622">        $lastPipeLoc = strrpos($mfgListStr, '|');</div>
+<div class="row_0" id="r623">        if ($lastPipeLoc !== false) {</div>
+<div class="row_1" id="r624">            $mfgListStr = substr($mfgListStr, 0, $lastPipeLoc) . ' or ' . substr($mfgListStr, $lastPipeLoc + 1); </div>
+<div class="row_0" id="r625">        }</div>
+<div class="row_1" id="r626">        $mfgListStr = str_replace(&quot;|&quot;, &quot;, &quot;, $mfgListStr);</div>
+<div class="row_0" id="r627">&nbsp;</div>
+<div class="row_1" id="r628">        // Iterate through the shopping cart parts and find their MFG</div>
+<div class="row_0" id="r629">        foreach ($order['Parts'] as &amp;$currPart) {</div>
+<div class="row_1" id="r630">            $mfg = $currPart['Manufacturer'];</div>
+<div class="row_0" id="r631">            </div>
+<div class="row_1" id="r632">            // Check if this matches/doesn't match</div>
+<div class="row_0" id="r633">            $in = in_array(strtoupper($mfg), $mfgArr);</div>
+<div class="row_1" id="r634">            if (( !$in &amp;&amp; $include ) || ( $in &amp;&amp; $exclude )) {</div>
+<div class="row_0" id="r635">                </div>
+<div class="row_1" id="r636">                // Set DoNotDiscount on this part</div>
+<div class="row_0" id="r637">                $this-&gt;do_not_discount[] = $currPart['key'];</div>
+<div class="row_1" id="r638">                $this-&gt;_log('Failed on %s, their mfg was %s', $currPart['key'], $mfg);</div>
+<div class="row_0" id="r639">                $blocked = true;</div>
+<div class="row_1" id="r640">            }  </div>
+<div class="row_0" id="r641">        }</div>
+<div class="row_1" id="r642">        </div>
+<div class="row_0" id="r643">        if ($blocked) {            </div>
+<div class="row_1" id="r644">            $not = $include ? '' : 'not'; // If it's exclude (!$include) then we let them know that items not in this group qualify</div>
+<div class="row_0" id="r645">            $issue = </div>
+<div class="row_1" id="r646">                &quot;Please note: Items $not manufactured by &quot; . </div>
+<div class="row_0" id="r647">                $mfgListStr . &quot; will be discounted with this promotion code. Please call us at 1.800.356.5221 if you have any questions.&quot;;</div>
+<div class="row_1" id="r648">            addIssue( $issue );</div>
+<div class="row_0" id="r649">        }</div>
+<div class="row_1" id="r650">    }</div>
+<div class="row_0" id="r651">    </div>
+<div class="row_1" id="r652">    /**</div>
+<div class="row_0" id="r653">     * Check category of the item is acceptable</div>
+<div class="row_1" id="r654">     */</div>
+<div class="row_0" id="r655">    public function check_cat($order, $cats, $type, $apply = false) </div>
+<div class="row_1" id="r656">    {</div>
+<div class="row_0" id="r657">        $this-&gt;_log('Called CPAP_Promo::check_cat with values %s, %s, %s', $cats, $type, $apply);</div>
+<div class="row_1" id="r658">        </div>
+<div class="row_0" id="r659">        // Set up valid PCID array</div>
+<div class="row_1" id="r660">        $catArr = explode('|', $cats);</div>
+<div class="row_0" id="r661">        </div>
+<div class="row_1" id="r662">        $include = ($type == 'IncludeCat');</div>
+<div class="row_0" id="r663">        $exclude = ($type == 'ExcludeCat');</div>
+<div class="row_1" id="r664">&nbsp;</div>
+<div class="row_0" id="r665">        // Iterate through the shopping cart parts and compare categories</div>
+<div class="row_1" id="r666">        foreach ($order['Parts'] as &amp;$currPart) {</div>
+<div class="row_0" id="r667">            $in = in_array($currPart['PCID'], $catArr);</div>
+<div class="row_1" id="r668">            // If they are IN the inclusion array, or NOT in the exclusi</div>
+<div class="row_0" id="r669">            if (( !$in &amp;&amp; $include ) || ( $in &amp;&amp; $exclude )) {</div>
+<div class="row_1" id="r670">                </div>
+<div class="row_0" id="r671">                $this-&gt;do_not_discount[] = $currPart['key'];</div>
+<div class="row_1" id="r672">                $this-&gt;_log('do_not_discount on %s, their category was %s', $currPart['key'], $currPart['PCID']);</div>
+<div class="row_0" id="r673">            }</div>
+<div class="row_1" id="r674">        }</div>
+<div class="row_0" id="r675">    }</div>
+<div class="row_1" id="r676">    </div>
+<div class="row_0" id="r677">    /**</div>
+<div class="row_1" id="r678">     * Check that the order includes/excludes certain PNums</div>
+<div class="row_0" id="r679">     */</div>
+<div class="row_1" id="r680">    private function check_parts($order, $parts, $type, $apply = false) </div>
+<div class="row_0" id="r681">    {</div>
+<div class="row_1" id="r682">        $this-&gt;_log('Called CPAP_Promo::check_parts with values %s, %s, %s', $parts, $type, $apply);</div>
+<div class="row_0" id="r683">        </div>
+<div class="row_1" id="r684">        // Set up valid PCID array</div>
+<div class="row_0" id="r685">        $partArr = explode('|', $parts);</div>
+<div class="row_1" id="r686">        </div>
+<div class="row_0" id="r687">        $include = ($type == 'IncludePart');</div>
+<div class="row_1" id="r688">        $exclude = ($type == 'ExcludePart');</div>
+<div class="row_0" id="r689">        </div>
+<div class="row_1" id="r690">        // Replace with https://wiki.php.net/rfc/array_column in PHP5.5</div>
+<div class="row_0" id="r691">        $keys = array();</div>
+<div class="row_1" id="r692">        // Iterate through the shopping cart parts and compare PNum</div>
+<div class="row_0" id="r693">        foreach ($order['Parts'] as &amp;$currPart) {</div>
+<div class="row_1" id="r694">            $keys[] = $currPart['PNum'];</div>
+<div class="row_0" id="r695">            </div>
+<div class="row_1" id="r696">            $in = in_array($currPart['PNum'], $partArr);</div>
+<div class="row_0" id="r697">            // If they are IN the inclusion array, or NOT in the exclusi</div>
+<div class="row_1" id="r698">            if (( !$in &amp;&amp; $include ) || ( $in &amp;&amp; $exclude )) {                </div>
+<div class="row_0" id="r699">                $this-&gt;do_not_discount[] = $currPart['key'];</div>
+<div class="row_1" id="r700">            }</div>
+<div class="row_0" id="r701">        }</div>
+<div class="row_1" id="r702">        </div>
+<div class="row_0" id="r703">        // DOn't think this is actually necessary - this just marks parts to include or exclude, NOT checks requirements</div>
+<div class="row_1" id="r704">        if ($include) {</div>
+<div class="row_0" id="r705">            // Check if all the required parts from $partArr are present in the order</div>
+<div class="row_1" id="r706">            $intersect = array_intersect($partArr, $keys);</div>
+<div class="row_0" id="r707">            $all_required_in_order = count($intersect) == count($partArr);</div>
+<div class="row_1" id="r708">            $this-&gt;_log('$include=True, count of intersect: %d, count of partArr: %d, intersect: %s', count($intersect), count($partArr), print_r($intersect, true));</div>
+<div class="row_0" id="r709">        } elseif ($exclude) {</div>
+<div class="row_1" id="r710">            $disallowed_item_exists = count($this-&gt;do_not_discount) &gt; 0;</div>
+<div class="row_0" id="r711">            $this-&gt;_log('$exclude=True, number of items that are disallowed: %d', count($disallowed_item_exists));</div>
+<div class="row_1" id="r712">        }</div>
+<div class="row_0" id="r713">    }</div>
+<div class="row_1" id="r714">    </div>
+<div class="row_0" id="r715">    /**</div>
+<div class="row_1" id="r716">     * Check the subtotal of the order is above a minimum required amount</div>
+<div class="row_0" id="r717">     */</div>
+<div class="row_1" id="r718">    private function check_order_amount($order, $amount) </div>
+<div class="row_0" id="r719">    {</div>
+<div class="row_1" id="r720">        $this-&gt;_log('Called CPAP_Promo::check_order_amount with values %s', $amount);</div>
+<div class="row_0" id="r721">        </div>
+<div class="row_1" id="r722">        //Find subtotal of non-problem parts</div>
+<div class="row_0" id="r723">        $goodSubtotal = 0;</div>
+<div class="row_1" id="r724">        foreach ($order['Parts'] as $cartPart){</div>
+<div class="row_0" id="r725">            $qty = $cartPart['quantity'];</div>
+<div class="row_1" id="r726">            $price = $cartPart['Price'];</div>
+<div class="row_0" id="r727">&nbsp;</div>
+<div class="row_1" id="r728">            if (!in_array($cartPart['key'], $this-&gt;do_not_discount)) {</div>
+<div class="row_0" id="r729">                // It's good -- accumulate</div>
+<div class="row_1" id="r730">                $goodSubtotal += ($qty * $price);</div>
+<div class="row_0" id="r731">            }</div>
+<div class="row_1" id="r732">        }</div>
+<div class="row_0" id="r733">       </div>
+<div class="row_1" id="r734">        // Compare</div>
+<div class="row_0" id="r735">        if ($goodSubtotal &lt; $amount) {</div>
+<div class="row_1" id="r736">            // Mark error at cart level</div>
+<div class="row_0" id="r737">            $this-&gt;do_not_discount_order = true;</div>
+<div class="row_1" id="r738">            $this-&gt;_set_error(PROMO_ERROR_TOTAL);</div>
+<div class="row_0" id="r739">        }</div>
+<div class="row_1" id="r740">    }</div>
+<div class="row_0" id="r741">    </div>
+<div class="row_1" id="r742">    /**</div>
+<div class="row_0" id="r743">     * Check the subtotal of the order is between the specific range</div>
+<div class="row_1" id="r744">     */</div>
+<div class="row_0" id="r745">    private function check_order_range($order, $min, $max) </div>
+<div class="row_1" id="r746">    {</div>
+<div class="row_0" id="r747">        $this-&gt;_log('Checking subtotal range is between %s and %s', $min, $max);</div>
+<div class="row_1" id="r748">        $min = floatval($min);</div>
+<div class="row_0" id="r749">        $max = floatval($max);</div>
+<div class="row_1" id="r750">        </div>
+<div class="row_0" id="r751">        // Only allow if there's a min and max?</div>
+<div class="row_1" id="r752">        // Should change this, but it's what existed in commonPromoFuncs before</div>
+<div class="row_0" id="r753">        if ($min == 0 || $max == 0) {</div>
+<div class="row_1" id="r754">            return true;</div>
+<div class="row_0" id="r755">        }</div>
+<div class="row_1" id="r756">&nbsp;</div>
+<div class="row_0" id="r757">        //Find subtotal of non-problem parts</div>
+<div class="row_1" id="r758">        $goodSubtotal = 0;</div>
+<div class="row_0" id="r759">        foreach ($order['Parts'] as $cartPart){</div>
+<div class="row_1" id="r760">            $qty = $cartPart['quantity'];</div>
+<div class="row_0" id="r761">            $price = $cartPart['Price'];</div>
+<div class="row_1" id="r762">&nbsp;</div>
+<div class="row_0" id="r763">            if (!in_array($cartPart['key'], $this-&gt;do_not_discount)) {</div>
+<div class="row_1" id="r764">                // It's good -- accumulate</div>
+<div class="row_0" id="r765">                $goodSubtotal += ($qty * $price);</div>
+<div class="row_1" id="r766">            }</div>
+<div class="row_0" id="r767">        }</div>
+<div class="row_1" id="r768">        </div>
+<div class="row_0" id="r769">        $this-&gt;_log('Good subtotal calculated at %s', $goodSubtotal);</div>
+<div class="row_1" id="r770">       </div>
+<div class="row_0" id="r771">        if ( ($goodSubtotal &lt; $min) || ($goodSubtotal &gt; $max) ) {</div>
+<div class="row_1" id="r772">            // Mark error at cart level</div>
+<div class="row_0" id="r773">            $this-&gt;do_not_discount_order = true;</div>
+<div class="row_1" id="r774">            $this-&gt;_set_error(PROMO_ERROR_TOTAL);</div>
+<div class="row_0" id="r775">        }</div>
+<div class="row_1" id="r776">    }</div>
+<div class="row_0" id="r777">    </div>
+<div class="row_1" id="r778">    /**</div>
+<div class="row_0" id="r779">     * Check state or country, since they're both similar</div>
+<div class="row_1" id="r780">     * [todo] this really shouldn't use $_SESSION to store this stuff, but order instead</div>
+<div class="row_0" id="r781">     */</div>
+<div class="row_1" id="r782">    public function check_state_country($order, $value, $type) </div>
+<div class="row_0" id="r783">    {</div>
+<div class="row_1" id="r784">        $this-&gt;_log('Called CPAP_Promo::check_state_country with values %s, %s', $value, $type);</div>
+<div class="row_0" id="r785">        </div>
+<div class="row_1" id="r786">        if (strpos($type, 'State') !== false) {</div>
+<div class="row_0" id="r787">            // State check</div>
+<div class="row_1" id="r788">            $okey = 'State';</div>
+<div class="row_0" id="r789">            $dkey = 'shipping_state';</div>
+<div class="row_1" id="r790">            $compare = ($type == 'IncludeState'); // If ExcludeState, $compare = false</div>
+<div class="row_0" id="r791">            $err = PROMO_ERROR_STATE;</div>
+<div class="row_1" id="r792">        } else {</div>
+<div class="row_0" id="r793">            // Country check</div>
+<div class="row_1" id="r794">            $okey = 'Country';</div>
+<div class="row_0" id="r795">            $dkey = 'shipping_country';</div>
+<div class="row_1" id="r796">            $compare = ($type == 'IncludeCountry'); // If ExcludeCountry, $compare = false</div>
+<div class="row_0" id="r797">            $err = PROMO_ERROR_COUNTRY;</div>
+<div class="row_1" id="r798">        }</div>
+<div class="row_0" id="r799">&nbsp;</div>
+<div class="row_1" id="r800">        // Set up valid  array</div>
+<div class="row_0" id="r801">        $checks = explode('|', $value);</div>
+<div class="row_1" id="r802">        $checks = array_map('strtoupper', $checks);</div>
+<div class="row_0" id="r803">        </div>
+<div class="row_1" id="r804">        if ($this-&gt;promo_source == 1) {</div>
+<div class="row_0" id="r805">            // Front end</div>
+<div class="row_1" id="r806">            $selected = $this-&gt;get_data($dkey);</div>
+<div class="row_0" id="r807">            if (!empty($selected) &amp;&amp; $selected !== '') {</div>
+<div class="row_1" id="r808">                $sel = strtoupper($selected);</div>
+<div class="row_0" id="r809">            }</div>
+<div class="row_1" id="r810">            else {</div>
+<div class="row_0" id="r811">                // No selected state exists at this point -- ignore filter</div>
+<div class="row_1" id="r812">                $this-&gt;_log('No %s has been specified yet, so ignoring check_state_country()', $okey);</div>
+<div class="row_0" id="r813">                return true;</div>
+<div class="row_1" id="r814">            }</div>
+<div class="row_0" id="r815">        }</div>
+<div class="row_1" id="r816">        else {</div>
+<div class="row_0" id="r817">            // Backend</div>
+<div class="row_1" id="r818">            $sel = strtoupper($order[$okey]);</div>
+<div class="row_0" id="r819">        }</div>
+<div class="row_1" id="r820">    </div>
+<div class="row_0" id="r821">        // Ignore when &quot;Other&quot; is selected</div>
+<div class="row_1" id="r822">        // Was only on State previously, so keep that</div>
+<div class="row_0" id="r823">        if ($sel == '--' &amp;&amp; $okey == 'State') {</div>
+<div class="row_1" id="r824">            return true;</div>
+<div class="row_0" id="r825">        }</div>
+<div class="row_1" id="r826">&nbsp;</div>
+<div class="row_0" id="r827">        // Check list</div>
+<div class="row_1" id="r828">        $in = in_array($sel, $checks) == $compare;</div>
+<div class="row_0" id="r829">        if ($in) {</div>
+<div class="row_1" id="r830">            return true;</div>
+<div class="row_0" id="r831">        } else {</div>
+<div class="row_1" id="r832">            $this-&gt;_log('check_state_country() check failed - they specified %s', $sel);</div>
+<div class="row_0" id="r833">            $this-&gt;_set_error($err);</div>
+<div class="row_1" id="r834">            $this-&gt;do_not_discount_order = true;</div>
+<div class="row_0" id="r835">        }</div>
+<div class="row_1" id="r836">    }</div>
+<div class="row_0" id="r837">    </div>
+<div class="row_1" id="r838">    /**</div>
+<div class="row_0" id="r839">     * Called in the same manner as sprintf()</div>
+<div class="row_1" id="r840">     * _log(&quot;something %s %s %s&quot;, $a, $b, $c)</div>
+<div class="row_0" id="r841">     */</div>
+<div class="row_1" id="r842">    protected function _log() </div>
+<div class="row_0" id="r843">    {</div>
+<div class="row_1" id="r844">        $args = func_get_args();</div>
+<div class="row_0" id="r845">        $text = vsprintf(array_shift($args), $args); // Use the first arg as the text, and the rest as the sprintf() args</div>
+<div class="row_1" id="r846">        $text = sprintf('[%s] %s', get_class($this), $text);</div>
+<div class="row_0" id="r847">        if ($this-&gt;public_debug == true) {</div>
+<div class="row_1" id="r848">            echo '&lt;p class=&quot;promo-debug&quot; style=&quot;text-align: left;font-weight: bold;&quot;&gt;'.$text.'&lt;/p&gt;';</div>
+<div class="row_0" id="r849">        }</div>
+<div class="row_1" id="r850">        $this-&gt;logs[] = $text;</div>
+<div class="row_0" id="r851">    }</div>
+<div class="row_1" id="r852">    </div>
+<div class="row_0" id="r853">    public function debug() </div>
+<div class="row_1" id="r854">    {</div>
+<div class="row_0" id="r855">        echo '&lt;pre&gt;';</div>
+<div class="row_1" id="r856">        var_dump($this-&gt;logs);</div>
+<div class="row_0" id="r857">        echo '&lt;/pre&gt;';</div>
+<div class="row_1" id="r858">    }</div>
+<div class="row_0" id="r859">    </div>
+<div class="row_1" id="r860">}</div>
+<div class="row_0" id="r861">&nbsp;</div>
+<div class="row_1" id="r862">function promo_get_info($code) {</div>
+<div class="row_0" id="r863">    $info = globalPromoGetPromoInfo($code); // Re-implement this in here</div>
+<div class="row_1" id="r864">    if (!is_array($info)) {</div>
+<div class="row_0" id="r865">        return false;</div>
+<div class="row_1" id="r866">    }</div>
+<div class="row_0" id="r867">                </div>
+<div class="row_1" id="r868">    // Load specific promo class</div>
+<div class="row_0" id="r869">    // [todo] Refactor this away later [and would apply to admin panel etc]/move to commonPromo somethingz as a chunky array</div>
+<div class="row_1" id="r870">    $names = array(</div>
+<div class="row_0" id="r871">        PROMO_TYPE_PERCENT      =&gt; 'Percent',</div>
+<div class="row_1" id="r872">        PROMO_TYPE_DOLLAR       =&gt; 'Dollar',</div>
+<div class="row_0" id="r873">        PROMO_TYPE_SHIPPING     =&gt; 'SetShipping',</div>
+<div class="row_1" id="r874">        PROMO_TYPE_ITEMDISCOUNT =&gt; 'ItemDiscount',</div>
+<div class="row_0" id="r875">        PROMO_TYPE_FREEBIE      =&gt; 'Freebie',</div>
+<div class="row_1" id="r876">        PROMO_TYPE_ITEMPRICE    =&gt; 'DiscountItems',</div>
+<div class="row_0" id="r877">        PROMO_TYPE_SETSHIPPING  =&gt; 'SetShipping',</div>
+<div class="row_1" id="r878">        PROMO_TYPE_SPENDSAVE    =&gt; 'SpendSave',</div>
+<div class="row_0" id="r879">        PROMO_TYPE_MASKINS      =&gt; 'MaskInsurance',</div>
+<div class="row_1" id="r880">        PROMO_TYPE_RESPMAP      =&gt; 'RESPMAP',</div>
+<div class="row_0" id="r881">    );</div>
+<div class="row_1" id="r882">    if (array_key_exists($info['DiscountType'], $names)) {</div>
+<div class="row_0" id="r883">        $cls = $names[ $info['DiscountType'] ] . 'Promo';</div>
+<div class="row_1" id="r884">        $info['class'] = $cls;</div>
+<div class="row_0" id="r885">    } else {</div>
+<div class="row_1" id="r886">        $info['class'] = 'CPAP_Promo';</div>
+<div class="row_0" id="r887">    }</div>
+<div class="row_1" id="r888">    </div>
+<div class="row_0" id="r889">    return $info;</div>
+<div class="row_1" id="r890">}</div>
+<div class="row_0" id="r891">&nbsp;</div>
+<div class="row_1" id="r892">function promo_get_params($PCID) {    </div>
+<div class="row_0" id="r893">    $params = array();</div>
+<div class="row_1" id="r894">    $sqlFilters = 'SELECT ParameterDesc, ParameterValue1, ParameterValue2, ParameterValue3</div>
+<div class="row_0" id="r895">        FROM PromoParmsTbl </div>
+<div class="row_1" id="r896">        WHERE PCID = '.$PCID;</div>
+<div class="row_0" id="r897">    $resultFilters = ConnectToDatabase($sqlFilters);</div>
+<div class="row_1" id="r898">    while ($row = mysql_fetch_assoc($resultFilters)) {</div>
+<div class="row_0" id="r899">        $params[ $row['ParameterDesc'] ] = $row;</div>
+<div class="row_1" id="r900">    }</div>
+<div class="row_0" id="r901">    return $params;</div>
+<div class="row_1" id="r902">}</div>
+<div class="row_0" id="r903">&nbsp;</div>
+                </div>
+        <script type="text/javascript" src="prisfm.js"></script>
+    </body>
+</html>
