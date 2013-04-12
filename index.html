@@ -57,20 +57,7 @@
             changes_len = 1;
             changes_where = 0;
             
-            codeblock = $('#code');
-            sp = codeblock.text().split("\n");
-            //alert('Changing line 9');
-            /*
-            cb = (function(sp, changes) {
-                sp[8] = ' * banana boat';
-                $('#code').text(sp.join("\n"));
-                alert('changed');
-            })(sp, changes);
-            
-            window.myinterval = window.setInterval(cb, 1000);
-            */
-            // use undascore or something
-            document.svnnumber = 743;
+            document.svnnumber = _.keys(changes)[0];
             inter = window.setInterval(update_area, 2000);
         });
         
