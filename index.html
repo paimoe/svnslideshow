@@ -46,6 +46,20 @@
         <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
         <script type="text/javascript" src="underscore-min.js"></script>
         <script type="text/javascript">
+        
+        function loaded(data) {    
+            changes = data;        
+            changes_len = 1;
+            changes_where = 0;
+            
+            document.svnnumber = _.keys(changes)[0];
+            inter = window.setInterval(update_area, 2000);
+        }
+        
+        function load_failed(data) {
+            alert('Could not load JSON changesets');
+        }
+        
         $(function() {
             
             // Load in html
@@ -53,12 +67,9 @@
             
             /** demo compiled diff code **/
             // loaded from compiled.js
-            changes = {"743": [{"line": 102, "replaceWith": "            $this_related = $post->related[$postid];\n"}, {"addAfter": "            \n", "line": 102}, {"addAfter": "            $related_format = IS_MOBILE ? 'related_posts_text' : 'related_posts_images'; // Use text links for mobile\n", "line": 103}, {"addAfter": "            $post->related = $this->load->view($related_format, array('related' => $this_related), True);            \n", "line": 104}, {"line": 108, "replaceWith": "            \n"}, {"addAfter": "            $this->load->view('view_post', $this->data);\n", "line": 108}]}; 
-            changes_len = 1;
-            changes_where = 0;
-            
-            document.svnnumber = _.keys(changes)[0];
-            inter = window.setInterval(update_area, 2000);
+            var jqxhr = $.getJSON('compiled.js')
+            .done(loaded)
+            .fail(load_failed);
         });
         
         function update_area(line, with_what) {
